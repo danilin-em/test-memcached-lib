@@ -1,0 +1,23 @@
+{
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest",
+    "phpunit/phpunit": "^11.0.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Memcached\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Memcached\\Tests\\": "tests/"
+    }
+  },
+    "scripts": {
+      "phpunit": "XDEBUG_IS_ACTIVE=1 XDEBUG_TRIGGER=XDEBUG_IS_ACTIVE XDEBUG_MODE=coverage,debug phpunit -c phpunit.xml --testdox",
+      "test": "@phpunit"
+    }
+}
