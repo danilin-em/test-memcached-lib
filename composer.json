@@ -1,6 +1,7 @@
 {
   "require": {
-    "php": ">=7.4"
+    "php": ">=7.4",
+    "ext-mbstring": "*"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",
@@ -16,8 +17,8 @@
       "Memcached\\Tests\\": "tests/"
     }
   },
-    "scripts": {
-      "phpunit": "XDEBUG_IS_ACTIVE=1 XDEBUG_TRIGGER=XDEBUG_IS_ACTIVE XDEBUG_MODE=coverage,debug phpunit -c phpunit.xml --testdox",
-      "test": "@phpunit"
-    }
+  "scripts": {
+    "phpunit": "XDEBUG_IS_ACTIVE=1 XDEBUG_TRIGGER=XDEBUG_IS_ACTIVE XDEBUG_MODE=coverage,debug phpunit -c phpunit.xml --testdox",
+    "test-unit": "@phpunit --testsuite Unit"
+  }
 }
