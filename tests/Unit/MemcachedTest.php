@@ -31,6 +31,7 @@ class MemcachedTest extends TestCase
     }
     private static function makeGeneratorCallback(string ...$lines): callable
     {
+        // @phpstan-ignore-next-line
         return static fn() => (static function (string ...$lines): Generator {
             foreach ($lines as $line) {
                 yield $line;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Memcached;
 
 use Generator;
-
 use Memcached\Exception\ClientWriteException;
 use Memcached\Exception\MemcachedException;
 use Memcached\Exception\ClientConnectionException;

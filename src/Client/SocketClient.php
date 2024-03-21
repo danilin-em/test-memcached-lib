@@ -40,7 +40,9 @@ final class SocketClient implements ClientInterface
                 $context
             );
             if ($socket === false) {
-                throw new ClientConnectionException(sprintf('Cannot establish connection: [%d] %s', $errorCode, $errorMessage));
+                throw new ClientConnectionException(
+                    sprintf('Cannot establish connection: [%d] %s', $errorCode, $errorMessage)
+                );
             }
             $this->socket = $socket;
         }

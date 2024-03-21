@@ -1,11 +1,27 @@
 {
+  "name": "danilin-em/memcached",
+  "description": "Memcached client for PHP. No dependencies, no extensions, no third-party libraries. No regrets.",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Evgenii Danilin",
+      "email": "evgenii.danilin.m@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/danilin-em/test-memcached-lib",
   "require": {
     "php": ">=7.4",
     "ext-mbstring": "*"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",
-    "phpunit/phpunit": "^11.0.6"
+    "phpunit/php-code-coverage": "10.1.10",
+    "phpunit/phpunit": "^10.1",
+    "infection/infection": "^0.27.11",
+    "phpstan/phpstan": "^1.10",
+    "phpmd/phpmd": "^2.15",
+    "squizlabs/php_codesniffer": "^3.9"
   },
   "autoload": {
     "psr-4": {
@@ -19,6 +35,26 @@
   },
   "scripts": {
     "phpunit": "XDEBUG_IS_ACTIVE=1 XDEBUG_TRIGGER=XDEBUG_IS_ACTIVE XDEBUG_MODE=coverage,debug phpunit -c phpunit.xml --testdox",
-    "test-unit": "@phpunit --testsuite Unit"
+    "test-unit": "@phpunit --testsuite Unit",
+    "infection": [
+      "Composer\\Config::disableProcessTimeout",
+      "infection --threads=6 --min-msi=80 --min-covered-msi=80 --log-verbosity=all --show-mutations --only-covered"
+    ],
+    "phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=512M --no-progress --error-format=table --no-interaction --ansi",
+    "phpcs": ["phpcs --standard=phpcs.xml --cache=./.tmp/.phpcs.cache"],
+    "phpcbf": ["phpcbf --standard=phpcs.xml --cache=./.tmp/.phpcs.cache"],
+    "phpmd": ["phpmd ./src text ./phpmd.xml"],
+    "cs": ["@phpcs", "@phpmd"],
+    "ci": [
+      "@cs",
+      "@phpstan",
+      "@phpunit",
+      "@infection"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "infection/extension-installer": true
+    }
   }
 }
