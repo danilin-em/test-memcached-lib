@@ -38,16 +38,25 @@ final class Memcached
     public function get(string $key): ?string
     {
         self::validateKey($key);
-        $header = $this->command(sprintf('get %s', $key))->current();
-        if (!$header) {
+        $line = $this->command(sprintf('get %s', $key));
+        $header = $line->current();
+        if ($header === null) {
             return null;
+        }
+        if (!is_string($header)) {
+            throw new ResponseErrorException('Cannot read header');
         }
         if (strpos($header, 'VALUE ') === 0) {
             [, , , $bytes] = explode(' ', trim($header));
             if (!$bytes) {
-                return null;
+                throw new ResponseErrorException('Cannot parse header');
             }
-            $data = trim($this->client->read((int)$bytes)->current());
+            $data = $this->client->read((int)$bytes)->current();
+            $line->next();
+            $end = $line->current();
+            if ($end !== null) {
+                throw new ResponseErrorException('Cannot reach the end of the data');
+            }
             return $data ?: null;
         }
         return null;
@@ -114,18 +123,29 @@ final class Memcached
      * @throws ResponseErrorException
      * @throws ResponseServerErrorException
      */
-    private function command(string $command, bool $noWait = false): Generator
+    private function command(string $command, bool $noreply = false): Generator
     {
         $this->client->connect();
 
         $writtenBytes = $this->client->write("$command\r\n");
 
-        if ($noWait) {
+        if ($noreply) {
             return yield $writtenBytes;
         }
 
+        $tries = 10;
         foreach ($this->client->read() as $line) {
-            $line = trim($line ?: '');
+            if ($tries === 0) {
+                throw new ResponseErrorException('Too many empty lines');
+            }
+            if ($line === false) {
+                throw new ResponseErrorException('Failed to read data');
+            }
+            $line = trim($line);
+            if (!$line) {
+                $tries--;
+                continue;
+            }
             if ($line === 'END') {
                 return yield null;
             }
