@@ -11,14 +11,13 @@
   ],
   "homepage": "https://github.com/danilin-em/test-memcached-lib",
   "require": {
-    "php": ">=7.4",
+    "php": "^8.3",
     "ext-mbstring": "*"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",
-    "phpunit/php-code-coverage": "10.1.10",
-    "phpunit/phpunit": "^10.1",
-    "infection/infection": "^0.27.11",
+    "phpunit/phpunit": "^11.0",
+    "infection/infection": "^0.28.1",
     "phpstan/phpstan": "^1.10",
     "phpmd/phpmd": "^2.15",
     "squizlabs/php_codesniffer": "^3.9"
@@ -53,6 +52,9 @@
     ]
   },
   "config": {
+    "platform": {
+      "php": "8.3"
+    },
     "allow-plugins": {
       "infection/extension-installer": true
     }

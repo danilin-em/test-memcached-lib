@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
-         backupGlobals="false"
          colors="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         stopOnError="false"
          stderr="true"
          cacheDirectory=".tmp/phpunit/.phpunit.cache"
-         backupStaticProperties="false"
          displayDetailsOnTestsThatTriggerWarnings="true"
 >
     <coverage>
         <report>
-            <text outputFile="php://stdout" showOnlySummary="true" showUncoveredFiles="false"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
             <html outputDirectory=".tmp/phpunit/coverage" lowUpperBound="35" highLowerBound="70"/>
             <cobertura outputFile=".tmp/phpunit/coverage/cobertura.xml"/>
         </report>
@@ -25,7 +20,7 @@
     </logging>
     <testsuites>
         <testsuite name="Unit">
-            <directory suffix="Test.php">tests/Unit</directory>
+            <directory>tests/Unit</directory>
         </testsuite>
     </testsuites>
     <source>
