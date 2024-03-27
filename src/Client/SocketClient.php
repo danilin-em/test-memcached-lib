@@ -18,7 +18,7 @@ final class SocketClient implements ClientInterface
     private string $address;
     private int $timeout;
 
-    public function __construct(string $address, int $timeout = 30)
+    public function __construct(string $address, int $timeout = 5)
     {
         $this->address = $address;
         $this->timeout = $timeout;
@@ -39,6 +39,7 @@ final class SocketClient implements ClientInterface
                 STREAM_CLIENT_CONNECT,
                 $context
             );
+            stream_set_timeout($this->socket, $this->timeout);
             if ($socket === false) {
                 throw new ClientConnectionException(
                     sprintf('Cannot establish connection: [%d] %s', $errorCode, $errorMessage)

@@ -55,7 +55,7 @@ class MemcachedTest extends TestCase
                 yield "VALUE key 0 5\r\n";
             })(),
             (static function (): Generator {
-                yield "value\r\n";
+                yield "value";
                 yield "END\r\n";
             })(),
         );

@@ -48,10 +48,13 @@ final class Memcached
         }
         if (strpos($header, 'VALUE ') === 0) {
             [, , , $bytes] = explode(' ', trim($header));
-            if (!$bytes) {
+            if (!is_numeric($bytes)) {
                 throw new ResponseErrorException('Cannot parse header');
             }
-            $data = $this->client->read((int)$bytes)->current();
+            $data = null;
+            if ($bytes) {
+                $data = $this->client->read((int)$bytes)->current();
+            }
             $line->next();
             $end = $line->current();
             if ($end !== null) {
