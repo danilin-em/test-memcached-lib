@@ -40,8 +40,8 @@
       "infection --threads=6 --min-msi=80 --min-covered-msi=80 --log-verbosity=all --show-mutations --only-covered"
     ],
     "phpstan": "phpstan analyse --configuration=phpstan.neon --memory-limit=512M --no-progress --error-format=table --no-interaction --ansi",
-    "phpcs": ["phpcs --standard=phpcs.xml --cache=./.tmp/.phpcs.cache"],
-    "phpcbf": ["phpcbf --standard=phpcs.xml --cache=./.tmp/.phpcs.cache"],
+    "phpcs": ["mkdir -p .tmp && phpcs --standard=phpcs.xml --cache=./.tmp/.phpcs.cache"],
+    "phpcbf": ["mkdir -p .tmp && phpcbf --standard=phpcs.xml --cache=./.tmp/.phpcs.cache"],
     "phpmd": ["phpmd ./src text ./phpmd.xml"],
     "cs": ["@phpcs", "@phpmd"],
     "ci": [

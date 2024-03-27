@@ -6,7 +6,7 @@
         ],
         "excludes": [
             "vendor",
-            "tests",
+            "tests"
         ]
     },
     "timeout": 25,
@@ -16,6 +16,7 @@
         "summary": ".tmp/infection/summary.log",
         "perMutator": ".tmp/infection/per-mutator.md",
         "gitlab": ".tmp/infection/gitlab-code-quality.json",
+        "github": true,
     },
     "tmpDir": ".tmp/infection/tmp",
     "phpUnit": {
@@ -23,7 +24,7 @@
     },
     "mutators": {
         "@default": true,
-        "@function_signature": true,
+        "@function_signature": true
     },
-    "testFramework": "phpunit",
+    "testFramework": "phpunit"
 }
