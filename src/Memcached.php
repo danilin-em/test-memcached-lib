@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Memcached;
 
 use Generator;
@@ -32,6 +30,7 @@ final class Memcached
     }
 
     /**
+     * @param string $key
      * @throws ClientConnectionException
      * @throws ClientWriteException
      * @throws InvalidArgumentException
@@ -39,7 +38,7 @@ final class Memcached
      * @throws ResponseErrorException
      * @throws ResponseServerErrorException
      */
-    public function get(string $key)
+    public function get($key)
     {
         self::validateKey($key);
         $line = $this->command(sprintf('get %s', $key));
@@ -70,6 +69,9 @@ final class Memcached
     }
 
     /**
+     * @param string $key
+     * @param string $data
+     * @param int|null $ttl
      * @throws ClientConnectionException
      * @throws ClientWriteException
      * @throws InvalidArgumentException
@@ -79,7 +81,7 @@ final class Memcached
      * @throws ResponseServerErrorException
      * @retrun void
      */
-    public function set(string $key, string $data, int $ttl = null)
+    public function set($key, $data, $ttl = null)
     {
         self::validateKey($key);
         if ($ttl === null) {
@@ -101,22 +103,24 @@ final class Memcached
     }
 
     /**
+     * @param string $key
      * @throws ClientConnectionException
      * @throws ClientWriteException
      * @throws InvalidArgumentException
      * @retrun void
      */
-    public function delete(string $key)
+    public function delete($key)
     {
         self::validateKey($key);
         $this->command(sprintf('delete %s noreply', $key), true)->current();
     }
 
     /**
+     * @param string $key
      * @throws InvalidArgumentException
      * @retrun void
      */
-    private static function validateKey(string $key)
+    private static function validateKey($key)
     {
         if (mb_strlen($key) > 250) {
             throw new InvalidArgumentException('Key is too long');
@@ -127,20 +131,24 @@ final class Memcached
     }
 
     /**
+     * @param string $command
+     * @param bool $noreply
+     * @return Generator
      * @throws ClientConnectionException
      * @throws ClientWriteException
      * @throws ResponseClientErrorException
      * @throws ResponseErrorException
      * @throws ResponseServerErrorException
      */
-    private function command(string $command, bool $noreply = false): Generator
+    private function command($command, $noreply = false)
     {
         $this->client->connect();
 
         $writtenBytes = $this->client->write("$command\r\n");
 
         if ($noreply) {
-            return yield $writtenBytes;
+            yield $writtenBytes;
+            return;
         }
 
         $tries = 10;
@@ -157,7 +165,8 @@ final class Memcached
                 continue;
             }
             if ($line === 'END') {
-                return yield null;
+                yield null;
+                return;
             }
             if (strpos($line, 'CLIENT_ERROR ') === 0) {
                 $line .= $this->client->read(1024)->current() ?: '';

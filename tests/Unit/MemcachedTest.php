@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Memcached\Tests\Unit;
 
 use Generator;
@@ -31,15 +29,16 @@ class MemcachedTest extends TestCase
         $this->client = $this->createMock(ClientInterface::class);
         $this->memcached = new Memcached($this->client);
     }
-    private static function makeGeneratorCallback(string ...$lines): callable
+    private static function makeGeneratorCallback(...$lines)
     {
         // @phpstan-ignore-next-line
         return static function () use ($lines) {
-            return (static function (string ...$lines): Generator {
+            $wrap = static function (...$lines) {
                 foreach ($lines as $line) {
                     yield $line;
                 }
-            })(...$lines);
+            };
+            return $wrap(...$lines);
         };
     }
 
@@ -54,14 +53,16 @@ class MemcachedTest extends TestCase
 
     public function testGetReturnsValueWhenKeyExists()
     {
+        $a = static function () {
+            yield "VALUE key 0 5\r\n";
+        };
+        $b = static function () {
+            yield "value";
+            yield "END\r\n";
+        };
         $this->client->method('read')->willReturnOnConsecutiveCalls(
-            (static function (): Generator {
-                yield "VALUE key 0 5\r\n";
-            })(),
-            (static function (): Generator {
-                yield "value";
-                yield "END\r\n";
-            })()
+            $a(),
+            $b()
         );
 
         $this->assertEquals('value', $this->memcached->get('key'));
@@ -69,13 +70,15 @@ class MemcachedTest extends TestCase
 
     public function testGetReturnsNullWhenDataBytesEmpty()
     {
+        $a = static function () {
+            yield "VALUE key 0 0\r\n";
+        };
+        $b = static function () {
+            yield "END\r\n";
+        };
         $this->client->method('read')->willReturnOnConsecutiveCalls(
-            (static function (): Generator {
-                yield "VALUE key 0 0\r\n";
-            })(),
-            (static function (): Generator {
-                yield "END\r\n";
-            })()
+            $a(),
+            $b()
         );
 
         $this->assertNull($this->memcached->get('key'));
@@ -83,13 +86,15 @@ class MemcachedTest extends TestCase
 
     public function testGetReturnsNullWhenHeaderIsInvalid()
     {
+        $a = static function () {
+            yield "invalid header\r\n";
+        };
+        $b = static function () {
+            yield "END\r\n";
+        };
         $this->client->method('read')->willReturnOnConsecutiveCalls(
-            (static function (): Generator {
-                yield "invalid header\r\n";
-            })(),
-            (static function (): Generator {
-                yield "END\r\n";
-            })()
+            $a(),
+            $b()
         );
 
         $this->assertNull($this->memcached->get('key'));

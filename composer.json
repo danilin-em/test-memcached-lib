@@ -11,12 +11,12 @@
   ],
   "homepage": "https://github.com/danilin-em/test-memcached-lib",
   "require": {
-    "php": "^7.0",
+    "php": "^5.6",
     "ext-mbstring": "*"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",
-    "phpunit/phpunit": "^6.5"
+    "phpunit/phpunit": "^5.7"
   },
   "autoload": {
     "psr-4": {

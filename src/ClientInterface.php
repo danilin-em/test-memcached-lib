@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Memcached;
 
 use Generator;
@@ -18,9 +16,15 @@ interface ClientInterface
 
     /**
      * @throws ClientWriteException
+     * @param string $data
+     * @retrun int
      */
-    public function write(string $data): int;
-    public function read(int $length = null): Generator;
+    public function write($data);
+    /**
+     * @param int|null $length
+     * @return Generator
+     */
+    public function read($length = null);
     /**
      * @return void
      */

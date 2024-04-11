@@ -1,10 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Memcached\Client;
 
-use Generator;
 use Memcached\ClientInterface;
 use Memcached\Exception\ClientConnectionException;
 use Memcached\Exception\ClientWriteException;
@@ -24,7 +21,7 @@ final class SocketClient implements ClientInterface
      */
     private $timeout;
 
-    public function __construct(string $address, int $timeout = 5)
+    public function __construct($address, $timeout = 5)
     {
         $this->address = $address;
         $this->timeout = $timeout;
@@ -51,14 +48,14 @@ final class SocketClient implements ClientInterface
                 );
             }
             $this->socket = $socket;
-            stream_set_timeout($this->socket, $this->timeout);
+            stream_set_timeout($this->socket, $this->timeout, 0);
         }
     }
 
     /**
      * @inheritDoc
      */
-    public function write(string $data): int
+    public function write($data)
     {
         $bytes = fwrite($this->socket, $data);
         if ($bytes === false) {
@@ -67,10 +64,14 @@ final class SocketClient implements ClientInterface
         return $bytes;
     }
 
-    public function read(int $length = null): Generator
+    /**
+     * @inheritDoc
+     */
+    public function read($length = null)
     {
         if ($length !== null) {
-            return yield fread($this->socket, $length);
+            yield fread($this->socket, $length);
+            return;
         }
         while (!feof($this->socket)) {
             yield fgets($this->socket);
