@@ -11,7 +11,7 @@
   ],
   "homepage": "https://github.com/danilin-em/test-memcached-lib",
   "require": {
-    "php": "^8.3",
+    "php": "^8.0",
     "ext-mbstring": "*"
   },
   "require-dev": {

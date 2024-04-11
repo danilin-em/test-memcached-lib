@@ -39,12 +39,12 @@ final class SocketClient implements ClientInterface
                 STREAM_CLIENT_CONNECT,
                 $context
             );
-            stream_set_timeout($this->socket, $this->timeout);
             if ($socket === false) {
                 throw new ClientConnectionException(
                     sprintf('Cannot establish connection: [%d] %s', $errorCode, $errorMessage)
                 );
             }
+            stream_set_timeout($this->socket, $this->timeout);
             $this->socket = $socket;
         }
     }
