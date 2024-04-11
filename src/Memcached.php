@@ -15,8 +15,12 @@ use Memcached\Exception\ResponseServerErrorException;
 
 final class Memcached
 {
-    public const DEFAULT_TTL = 3600;
-    private ClientInterface $client;
+    const DEFAULT_TTL = 3600;
+
+    /**
+     * @var ClientInterface
+     */
+    private $client;
 
     public function __construct(ClientInterface $client)
     {
@@ -35,7 +39,7 @@ final class Memcached
      * @throws ResponseErrorException
      * @throws ResponseServerErrorException
      */
-    public function get(string $key): ?string
+    public function get(string $key)
     {
         self::validateKey($key);
         $line = $this->command(sprintf('get %s', $key));
@@ -47,7 +51,7 @@ final class Memcached
             throw new ResponseErrorException('Cannot read header');
         }
         if (strpos($header, 'VALUE ') === 0) {
-            [, , , $bytes] = explode(' ', trim($header));
+            list(, , , $bytes) = explode(' ', trim($header));
             if (!is_numeric($bytes)) {
                 throw new ResponseErrorException('Cannot parse header');
             }
@@ -73,8 +77,9 @@ final class Memcached
      * @throws ResponseClientErrorException
      * @throws ResponseErrorException
      * @throws ResponseServerErrorException
+     * @retrun void
      */
-    public function set(string $key, string $data, int $ttl = null): void
+    public function set(string $key, string $data, int $ttl = null)
     {
         self::validateKey($key);
         if ($ttl === null) {
@@ -99,8 +104,9 @@ final class Memcached
      * @throws ClientConnectionException
      * @throws ClientWriteException
      * @throws InvalidArgumentException
+     * @retrun void
      */
-    public function delete(string $key): void
+    public function delete(string $key)
     {
         self::validateKey($key);
         $this->command(sprintf('delete %s noreply', $key), true)->current();
@@ -108,8 +114,9 @@ final class Memcached
 
     /**
      * @throws InvalidArgumentException
+     * @retrun void
      */
-    private static function validateKey(string $key): void
+    private static function validateKey(string $key)
     {
         if (mb_strlen($key) > 250) {
             throw new InvalidArgumentException('Key is too long');

@@ -15,8 +15,14 @@ final class SocketClient implements ClientInterface
      * @var resource/null
      */
     private $socket = null;
-    private string $address;
-    private int $timeout;
+    /**
+     * @var string
+     */
+    private $address;
+    /**
+     * @var int
+     */
+    private $timeout;
 
     public function __construct(string $address, int $timeout = 5)
     {
@@ -27,7 +33,7 @@ final class SocketClient implements ClientInterface
     /**
      * @inheritDoc
      */
-    public function connect(): void
+    public function connect()
     {
         if (!is_resource($this->socket)) {
             $context = stream_context_create();
@@ -39,13 +45,13 @@ final class SocketClient implements ClientInterface
                 STREAM_CLIENT_CONNECT,
                 $context
             );
-            stream_set_timeout($this->socket, $this->timeout);
             if ($socket === false) {
                 throw new ClientConnectionException(
                     sprintf('Cannot establish connection: [%d] %s', $errorCode, $errorMessage)
                 );
             }
             $this->socket = $socket;
+            stream_set_timeout($this->socket, $this->timeout);
         }
     }
 
@@ -71,7 +77,7 @@ final class SocketClient implements ClientInterface
         }
     }
 
-    public function close(): void
+    public function close()
     {
         if (is_resource($this->socket)) {
             fclose($this->socket);

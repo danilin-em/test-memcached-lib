@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Memcached\Tests\Unit;
 
 use Generator;
-
 use Memcached\Exception\ResponseClientErrorException;
 use Memcached\Exception\ResponseErrorException;
 use Memcached\Exception\ResponseServerErrorException;
 use PHPUnit\Framework\TestCase;
-
 use Memcached\Memcached;
 use Memcached\ClientInterface;
 use Memcached\Exception\InvalidArgumentException;
@@ -22,9 +20,13 @@ class MemcachedTest extends TestCase
      * @var ClientInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $client;
-    private Memcached $memcached;
 
-    protected function setUp(): void
+    /**
+     * @var Memcached
+     */
+    private $memcached;
+
+    protected function setUp()
     {
         $this->client = $this->createMock(ClientInterface::class);
         $this->memcached = new Memcached($this->client);
@@ -32,14 +34,16 @@ class MemcachedTest extends TestCase
     private static function makeGeneratorCallback(string ...$lines): callable
     {
         // @phpstan-ignore-next-line
-        return static fn() => (static function (string ...$lines): Generator {
-            foreach ($lines as $line) {
-                yield $line;
-            }
-        })(...$lines);
+        return static function () use ($lines) {
+            return (static function (string ...$lines): Generator {
+                foreach ($lines as $line) {
+                    yield $line;
+                }
+            })(...$lines);
+        };
     }
 
-    public function testGetReturnsNullWhenKeyDoesNotExist(): void
+    public function testGetReturnsNullWhenKeyDoesNotExist()
     {
         $this->client->method('read')->willReturnCallback(self::makeGeneratorCallback(
             "END\r\n"
@@ -48,7 +52,7 @@ class MemcachedTest extends TestCase
         $this->assertNull($this->memcached->get('nonexistent_key'));
     }
 
-    public function testGetReturnsValueWhenKeyExists(): void
+    public function testGetReturnsValueWhenKeyExists()
     {
         $this->client->method('read')->willReturnOnConsecutiveCalls(
             (static function (): Generator {
@@ -57,13 +61,13 @@ class MemcachedTest extends TestCase
             (static function (): Generator {
                 yield "value";
                 yield "END\r\n";
-            })(),
+            })()
         );
 
         $this->assertEquals('value', $this->memcached->get('key'));
     }
 
-    public function testGetReturnsNullWhenDataBytesEmpty(): void
+    public function testGetReturnsNullWhenDataBytesEmpty()
     {
         $this->client->method('read')->willReturnOnConsecutiveCalls(
             (static function (): Generator {
@@ -71,13 +75,13 @@ class MemcachedTest extends TestCase
             })(),
             (static function (): Generator {
                 yield "END\r\n";
-            })(),
+            })()
         );
 
         $this->assertNull($this->memcached->get('key'));
     }
 
-    public function testGetReturnsNullWhenHeaderIsInvalid(): void
+    public function testGetReturnsNullWhenHeaderIsInvalid()
     {
         $this->client->method('read')->willReturnOnConsecutiveCalls(
             (static function (): Generator {
@@ -85,81 +89,81 @@ class MemcachedTest extends TestCase
             })(),
             (static function (): Generator {
                 yield "END\r\n";
-            })(),
+            })()
         );
 
         $this->assertNull($this->memcached->get('key'));
     }
 
-    public function testSetStoresData(): void
+    public function testSetStoresData()
     {
         $this->client->method('read')->willReturnCallback(self::makeGeneratorCallback(
-            "STORED\r\n",
+            "STORED\r\n"
         ));
 
         $this->memcached->set('key', 'value');
-        $this->expectNotToPerformAssertions();
+        $this->assertTrue(true);
     }
 
-    public function testSetThrowsExceptionWhenDataIsNotStored(): void
+    public function testSetThrowsExceptionWhenDataIsNotStored()
     {
         $this->client->method('read')->willReturnCallback(self::makeGeneratorCallback(
-            "NOT_STORED\r\n",
+            "NOT_STORED\r\n"
         ));
 
         $this->expectException(MemcachedException::class);
         $this->memcached->set('key', 'value');
     }
 
-    public function testDeleteRemovesKey(): void
+    public function testDeleteRemovesKey()
     {
         $this->memcached->delete('key');
-        $this->expectNotToPerformAssertions();
+        $this->assertTrue(true);
     }
 
-    public function testValidateKeyThrowsExceptionWhenKeyIsTooLong(): void
+    public function testValidateKeyThrowsExceptionWhenKeyIsTooLong()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->memcached->get(str_repeat('a', 251));
     }
 
-    public function testValidateKeyThrowsExceptionWhenKeyContainsInvalidCharacters(): void
+    public function testValidateKeyThrowsExceptionWhenKeyContainsInvalidCharacters()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->memcached->get("key\n");
     }
 
-    public function testResponseClientErrorException(): void
+    public function testResponseClientErrorException()
     {
         $this->expectException(ResponseClientErrorException::class);
         $this->client->method('read')->willReturnCallback(self::makeGeneratorCallback(
-            "CLIENT_ERROR test\r\n",
+            "CLIENT_ERROR test\r\n"
         ));
 
         $this->memcached->set('key', 'value');
     }
 
-    public function testResponseServerErrorException(): void
+    public function testResponseServerErrorException()
     {
         $this->expectException(ResponseServerErrorException::class);
         $this->client->method('read')->willReturnCallback(self::makeGeneratorCallback(
-            "SERVER_ERROR test\r\n",
+            "SERVER_ERROR test\r\n"
         ));
 
         $this->memcached->set('key', 'value');
     }
 
-    public function testResponseErrorException(): void
+    public function testResponseErrorException()
     {
         $this->expectException(ResponseErrorException::class);
         $this->client->method('read')->willReturnCallback(self::makeGeneratorCallback(
-            "ERROR\r\n",
+            "ERROR\r\n"
         ));
 
         $this->memcached->set('key', 'value');
     }
 
-    public function testDestructorClosesConnection(): void
+    public function testDestructorClosesConnection()
     {
         $this->client->expects(self::once())->method('close');
         unset($this->memcached);
