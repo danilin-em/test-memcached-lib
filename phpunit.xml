@@ -4,8 +4,7 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          stderr="true"
-         cacheDirectory=".tmp/phpunit/.phpunit.cache"
-         displayDetailsOnTestsThatTriggerWarnings="true"
+         cacheResultFile=".tmp/phpunit/.phpunit.cache"
 >
     <coverage>
         <report>
@@ -13,6 +12,12 @@
             <html outputDirectory=".tmp/phpunit/coverage" lowUpperBound="35" highLowerBound="70"/>
             <cobertura outputFile=".tmp/phpunit/coverage/cobertura.xml"/>
         </report>
+        <include>
+            <directory>src</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+        </exclude>
     </coverage>
     <logging>
         <junit outputFile=".tmp/phpunit/junit.xml"/>
@@ -23,14 +28,6 @@
             <directory>tests/Unit</directory>
         </testsuite>
     </testsuites>
-    <source>
-        <include>
-            <directory>src</directory>
-        </include>
-        <exclude>
-            <directory>vendor</directory>
-        </exclude>
-    </source>
     <php>
         <ini name="error_reporting" value="-1"/>
         <ini name="memory_limit" value="-1"/>
